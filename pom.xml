@@ -3,12 +3,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
-
   <groupId>com.squareup.okhttp3</groupId>
   <artifactId>parent</artifactId>
   <version>3.14.10-SNAPSHOT</version>
@@ -737,4 +731,17 @@
       </properties>
     </profile>
   </profiles>
+
+  <distributionManagement>
+    <repository>
+      <id>central</id>
+      <name>zimperium-releases</name>
+      <url>https://zimperium.jfrog.io/zimperium/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>zimperium-snapshots</name>
+      <url>https://zimperium.jfrog.io/zimperium/libs-snapshot-local</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

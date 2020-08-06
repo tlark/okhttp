@@ -32,6 +32,7 @@ public final class Request {
   final HttpUrl url;
   final String method;
   final Headers headers;
+  final Headers proxyHeaders;
   final @Nullable RequestBody body;
   final Map<Class<?>, Object> tags;
 
@@ -41,6 +42,7 @@ public final class Request {
     this.url = builder.url;
     this.method = builder.method;
     this.headers = builder.headers.build();
+    this.proxyHeaders = builder.proxyHeaders.build();
     this.body = builder.body;
     this.tags = Util.immutableMap(builder.tags);
   }
@@ -63,6 +65,19 @@ public final class Request {
 
   public List<String> headers(String name) {
     return headers.values(name);
+  }
+
+  public Headers proxyHeaders() {
+    return proxyHeaders;
+  }
+
+  public @Nullable
+  String proxyHeader(String name) {
+    return proxyHeaders.get(name);
+  }
+
+  public List<String> proxyHeaders(String name) {
+    return proxyHeaders.values(name);
   }
 
   public @Nullable RequestBody body() {
@@ -120,6 +135,7 @@ public final class Request {
     @Nullable HttpUrl url;
     String method;
     Headers.Builder headers;
+    Headers.Builder proxyHeaders;
     @Nullable RequestBody body;
 
     /** A mutable map of tags, or an immutable empty map if we don't have any. */
@@ -128,6 +144,7 @@ public final class Request {
     public Builder() {
       this.method = "GET";
       this.headers = new Headers.Builder();
+      this.proxyHeaders = new Headers.Builder();
     }
 
     Builder(Request request) {
@@ -138,6 +155,7 @@ public final class Request {
           ? Collections.emptyMap()
           : new LinkedHashMap<>(request.tags);
       this.headers = request.headers.newBuilder();
+      this.proxyHeaders = request.proxyHeaders.newBuilder();
     }
 
     public Builder url(HttpUrl url) {
@@ -206,6 +224,44 @@ public final class Request {
     /** Removes all headers on this builder and adds {@code headers}. */
     public Builder headers(Headers headers) {
       this.headers = headers.newBuilder();
+      return this;
+    }
+
+    /**
+     * Sets the proxy header named {@code name} to {@code value}. If this request already has any
+     * proxy headers with that name, they are all replaced.
+     */
+    public Builder proxyHeader(String name, String value) {
+      proxyHeaders.set(name, value);
+      return this;
+    }
+
+    /**
+     * Adds a proxy header with {@code name} and {@code value}. Prefer this method for
+     * multiply-valued proxy headers like "Cookie".
+     *
+     * <p>Note that for some headers including {@code Proxy-Connection}, {@code Host} and
+     * {@code User-Agent}, OkHttp may replace {@code value} with a proxy header derived from
+     * the request body.
+     */
+    public Builder addProxyHeader(String name, String value) {
+      proxyHeaders.add(name, value);
+      return this;
+    }
+
+    /**
+     * Removes all proxy headers named {@code name} on this builder.
+     */
+    public Builder removeProxyHeader(String name) {
+      proxyHeaders.removeAll(name);
+      return this;
+    }
+
+    /**
+     * Removes all proxy headers on this builder and adds {@code proxyHeaders}.
+     */
+    public Builder proxyHeaders(Headers proxyHeaders) {
+      this.proxyHeaders = proxyHeaders.newBuilder();
       return this;
     }
 
